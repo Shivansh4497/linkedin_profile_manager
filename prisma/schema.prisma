@@ -1,0 +1,349 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================
+// User & Authentication
+// ============================================
+
+model User {
+  id              String   @id @default(uuid())
+  email           String   @unique
+  name            String?
+  liAccessToken   String?  @map("li_access_token")
+  liRefreshToken  String?  @map("li_refresh_token")
+  tokenExpiresAt  DateTime? @map("token_expires_at")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  profile         LinkedInProfile?
+  posts           LinkedInPost[]
+  goals           Goal[]
+  drafts          PostDraft[]
+  insights        Insight[]
+  analyticsSnapshots AnalyticsSnapshot[]
+  demographics    AudienceDemographic[]
+  hashtagStats    HashtagStat[]
+
+  @@map("users")
+}
+
+// ============================================
+// LinkedIn Profile
+// ============================================
+
+model LinkedInProfile {
+  id            String   @id @default(uuid())
+  userId        String   @unique @map("user_id")
+  linkedinId    String   @unique @map("linkedin_id")
+  name          String
+  headline      String?
+  profileUrl    String?  @map("profile_url")
+  avatarUrl     String?  @map("avatar_url")
+  followers     Int      @default(0)
+  connections   Int      @default(0)
+  fetchedAt     DateTime @map("fetched_at")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("li_profiles")
+}
+
+// ============================================
+// LinkedIn Posts
+// ============================================
+
+model LinkedInPost {
+  id              String   @id @default(uuid())
+  userId          String   @map("user_id")
+  linkedinPostId  String   @unique @map("linkedin_post_id")
+  content         String
+  postType        PostType @default(TEXT) @map("post_type")
+  publishedAt     DateTime @map("published_at")
+  impressions     Int      @default(0)
+  likes           Int      @default(0)
+  comments        Int      @default(0)
+  shares          Int      @default(0)
+  engagementRate  Float?   @map("engagement_rate")
+  fetchedAt       DateTime @map("fetched_at")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  metricsHistory  PostMetricsHistory[]
+  postComments    PostComment[]
+  demographics    PostDemographic[]
+
+  @@map("li_posts")
+}
+
+// ============================================
+// Post Metrics History (Daily Snapshots)
+// ============================================
+
+model PostMetricsHistory {
+  id              String   @id @default(uuid())
+  postId          String   @map("post_id")
+  date            DateTime @db.Date
+  impressions     Int      @default(0)
+  likes           Int      @default(0)
+  comments        Int      @default(0)
+  shares          Int      @default(0)
+  
+  // Changes from previous day (calculated)
+  impressionsDelta Int?    @map("impressions_delta")
+  likesDelta       Int?    @map("likes_delta")
+  commentsDelta    Int?    @map("comments_delta")
+  sharesDelta      Int?    @map("shares_delta")
+  
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  // Relations
+  post            LinkedInPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, date])
+  @@map("post_metrics_history")
+}
+
+enum PostType {
+  TEXT
+  IMAGE
+  CAROUSEL
+  VIDEO
+  ARTICLE
+}
+
+// ============================================
+// Goals
+// ============================================
+
+model Goal {
+  id            String     @id @default(uuid())
+  userId        String     @map("user_id")
+  type          GoalType
+  title         String
+  targetValue   Float      @map("target_value")
+  currentValue  Float      @default(0) @map("current_value")
+  unit          GoalUnit
+  deadline      DateTime?
+  status        GoalStatus @default(ACTIVE)
+  aiSuggested   Boolean    @default(false) @map("ai_suggested")
+  notes         String?
+  createdAt     DateTime   @default(now()) @map("created_at")
+  updatedAt     DateTime   @updatedAt @map("updated_at")
+
+  // Relations
+  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("goals")
+}
+
+enum GoalType {
+  FOLLOWERS
+  ENGAGEMENT
+  CONSISTENCY
+  VISIBILITY
+  AUTHORITY
+  LEADS
+}
+
+enum GoalUnit {
+  COUNT
+  PERCENTAGE
+  PER_WEEK
+  PER_MONTH
+}
+
+enum GoalStatus {
+  ACTIVE
+  COMPLETED
+  PAUSED
+  FAILED
+}
+
+// ============================================
+// Post Drafts (AI Generated)
+// ============================================
+
+model PostDraft {
+  id              String      @id @default(uuid())
+  userId          String      @map("user_id")
+  topic           String
+  topicReasoning  String?     @map("topic_reasoning")
+  content         String
+  variations      Json?       // Store multiple variations as JSON
+  status          DraftStatus @default(DRAFT)
+  scheduledFor    DateTime?   @map("scheduled_for")
+  publishedAt     DateTime?   @map("published_at")
+  linkedinPostId  String?     @map("linkedin_post_id")
+  feedback        String?     // User feedback on rejected drafts
+  createdAt       DateTime    @default(now()) @map("created_at")
+  updatedAt       DateTime    @updatedAt @map("updated_at")
+
+  // Relations
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("post_drafts")
+}
+
+enum DraftStatus {
+  DRAFT
+  APPROVED
+  SCHEDULED
+  PUBLISHED
+  REJECTED
+}
+
+// ============================================
+// Analytics Snapshots (Daily)
+// ============================================
+
+model AnalyticsSnapshot {
+  id              String   @id @default(uuid())
+  userId          String   @map("user_id")
+  date            DateTime @db.Date
+  followers       Int
+  followersChange Int?     @map("followers_change")
+  totalImpressions Int?    @map("total_impressions")
+  totalEngagements Int?    @map("total_engagements")
+  engagementRate  Float?   @map("engagement_rate")
+  postsCount      Int?     @map("posts_count")
+  profileViews    Int?     @map("profile_views")
+  searchAppearances Int?   @map("search_appearances")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@map("analytics_snapshots")
+}
+
+// ============================================
+// AI Insights
+// ============================================
+
+model Insight {
+  id            String      @id @default(uuid())
+  userId        String      @map("user_id")
+  type          InsightType
+  title         String
+  content       String
+  data          Json?       // Supporting data for the insight
+  priority      Int         @default(0)
+  isRead        Boolean     @default(false) @map("is_read")
+  isActionable  Boolean     @default(true) @map("is_actionable")
+  actionType    String?     @map("action_type")
+  generatedAt   DateTime    @default(now()) @map("generated_at")
+  expiresAt     DateTime?   @map("expires_at")
+  createdAt     DateTime    @default(now()) @map("created_at")
+
+  // Relations
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("insights")
+}
+
+// ============================================
+// Post Comments
+// ============================================
+
+model PostComment {
+  id              String   @id @default(uuid())
+  postId          String   @map("post_id")
+  commenterName   String   @map("commenter_name")
+  commenterHeadline String? @map("commenter_headline")
+  commentText     String   @map("comment_text")
+  commentedAt     DateTime? @map("commented_at")
+  sentiment       String?  // positive, neutral, negative
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  // Relations
+  post            LinkedInPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@map("post_comments")
+}
+
+// ============================================
+// Audience Demographics
+// ============================================
+
+model AudienceDemographic {
+  id              String   @id @default(uuid())
+  userId          String   @map("user_id")
+  date            DateTime @db.Date
+  category        String   // JOB_TITLE, INDUSTRY, LOCATION, COMPANY
+  value           String
+  percentage      Float
+  rank            Int      @default(0)
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, date, category])
+  @@map("audience_demographics")
+}
+
+// ============================================
+// Post Demographics (Detailed Analytics)
+// ============================================
+
+model PostDemographic {
+  id          String   @id @default(uuid())
+  postId      String   @map("post_id")
+  category    String   // JOB_TITLE, COMPANY, LOCATION
+  value       String
+  percentage  Float
+  createdContent String? @map("created_content") // For potential future use
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  post        LinkedInPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([postId, category])
+  @@map("post_demographics")
+}
+
+// ============================================
+// Hashtag Performance
+// ============================================
+
+model HashtagStat {
+  id              String   @id @default(uuid())
+  userId          String   @map("user_id")
+  hashtag         String
+  postsCount      Int      @default(0) @map("posts_count")
+  totalImpressions Int     @default(0) @map("total_impressions")
+  totalLikes      Int      @default(0) @map("total_likes")
+  avgEngagement   Float?   @map("avg_engagement")
+  lastUsedAt      DateTime? @map("last_used_at")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, hashtag])
+  @@map("hashtag_stats")
+}
+
+enum InsightType {
+  PERFORMANCE
+  TIMING
+  CONTENT
+  GOAL
+  TREND
+}

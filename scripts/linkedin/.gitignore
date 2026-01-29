@@ -1,0 +1,6 @@
+# Sensitive auth data - never commit
+.auth/
+linkedin-session.json
+
+# Scraped data backups
+data/
