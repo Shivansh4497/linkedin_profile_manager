@@ -132,7 +132,7 @@ export async function aggregatePostMetrics(userId: string): Promise<{
     });
 
     const totals = posts.reduce(
-        (acc, post) => ({
+        (acc: { posts: number; impressions: number; likes: number; comments: number; shares: number }, post) => ({
             posts: acc.posts + 1,
             impressions: acc.impressions + post.impressions,
             likes: acc.likes + post.likes,

@@ -1,0 +1,71 @@
+{
+  "jsonScripts": [],
+  "inlineScripts": [],
+  "visibleDemographics": [
+    {
+      "text": "Post viewers demographics\nGreater Bengaluru Area\nFrom this location\n40%\nSenior\nWith this experience level\n40%\n10,001+ employees\nAt companies of this size\n29%\nShow all",
+      "location": "SECTION.artdeco-card.member-analytics-addon-card__base-card"
+    },
+    {
+      "text": "Post viewers demographics\nGreater Bengaluru Area\nFrom this location\n40%\nSenior\nWith this experience level\n40%\n10,001+ employees\nAt companies of this size\n29%\nShow all",
+      "location": "DIV.member-analytics-addon-loader"
+    },
+    {
+      "text": "Post viewers demographics\nGreater Bengaluru Area\nFrom this location\n40%\nSenior\nWith this experience level\n40%\n10,001+ employees\nAt companies of this size\n29%\nShow all",
+      "location": "DIV."
+    },
+    {
+      "text": "Greater Bengaluru Area\nFrom this location\n40%\nSenior\nWith this experience level\n40%\n10,001+ employees\nAt companies of this size\n29%",
+      "location": "DIV.member-analytics-addon-card__subcomponent-container.member-analytics-addon-card__subcomponent-container--vertical"
+    },
+    {
+      "text": "Greater Bengaluru Area\nFrom this location\n40%\nSenior\nWith this experience level\n40%\n10,001+ employees\nAt companies of this size\n29%",
+      "location": "DIV."
+    },
+    {
+      "text": "Greater Bengaluru Area\nFrom this location\n40%\nSenior\nWith this experience level\n40%\n10,001+ employees\nAt companies of this size\n29%",
+      "location": "DIV.member-analytics-addon-chart-module"
+    },
+    {
+      "text": "Greater Bengaluru Area\nFrom this location\n40%\nSenior\nWith this experience level\n40%\n10,001+ employees\nAt companies of this size\n29%",
+      "location": "DIV.member-analytics-addon-loader"
+    },
+    {
+      "text": "Greater Bengaluru Area\nFrom this location\n40%\nSenior\nWith this experience level\n40%\n10,001+ employees\nAt companies of this size\n29%",
+      "location": "DIV."
+    },
+    {
+      "text": "Greater Bengaluru Area\nFrom this location\n40%\nSenior\nWith this experience level\n40%\n10,001+ employees\nAt companies of this size\n29%",
+      "location": "DIV."
+    },
+    {
+      "text": "Greater Bengaluru Area\nFrom this location\n40%\nSenior\nWith this experience level\n40%\n10,001+ employees\nAt companies of this size\n29%",
+      "location": "UL.full-width.list-style-none"
+    },
+    {
+      "text": "Greater Bengaluru Area\nFrom this location\n40%",
+      "location": "LI.member-analytics-addon-meter-bars-chart__row"
+    },
+    {
+      "text": "Greater Bengaluru Area\nFrom this location\n40%",
+      "location": "A.member-analytics-addon-meter-bars-chart__link"
+    },
+    {
+      "text": "Greater Bengaluru Area\nFrom this location\n40%",
+      "location": "DIV.member-analytics-addon-meter-bars-chart__bar"
+    },
+    {
+      "text": "Senior\nWith this experience level\n40%",
+      "location": "LI.member-analytics-addon-meter-bars-chart__row"
+    },
+    {
+      "text": "Senior\nWith this experience level\n40%",
+      "location": "A.member-analytics-addon-meter-bars-chart__link"
+    },
+    {
+      "text": "Senior\nWith this experience level\n40%",
+      "location": "DIV.member-analytics-addon-meter-bars-chart__bar"
+    }
+  ],
+  "embeddedState": "not found"
+}

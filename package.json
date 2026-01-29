@@ -9,7 +9,8 @@
     "lint": "eslint",
     "linkedin:login": "npx tsx scripts/linkedin/login.ts",
     "linkedin:scrape": "npx tsx scripts/linkedin/scrape.ts",
-    "linkedin:sync": "npx tsx scripts/linkedin/sync.ts"
+    "linkedin:sync": "npx tsx scripts/linkedin/sync.ts",
+    "worker": "npx tsx scripts/worker.ts"
   },
   "dependencies": {
     "@playwright/test": "^1.58.0",

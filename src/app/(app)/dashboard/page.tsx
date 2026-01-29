@@ -53,20 +53,40 @@ export default function DashboardPage() {
         }
     }, [isAuthenticated]);
 
-    // Sync data
+    // Sync data - Creates a sync job for the remote worker
     const handleSync = useCallback(async () => {
         setIsSyncing(true);
         try {
-            const response = await fetch("/api/sync", { method: "POST" });
+            // Trigger a sync job (queued for Mac worker)
+            const response = await fetch("/api/sync/trigger", { method: "POST" });
             const data = await response.json();
 
-            if (data.success) {
-                // Refetch all data
-                await Promise.all([refetch(), fetchPosts(), refetchAnalytics()]);
+            if (data.job) {
+                // Poll for job completion
+                const pollInterval = setInterval(async () => {
+                    const statusRes = await fetch("/api/sync/trigger");
+                    const statusData = await statusRes.json();
+
+                    if (statusData.currentJob?.status === "COMPLETED") {
+                        clearInterval(pollInterval);
+                        setIsSyncing(false);
+                        // Refetch all data
+                        await Promise.all([refetch(), fetchPosts(), refetchAnalytics()]);
+                    } else if (statusData.currentJob?.status === "FAILED") {
+                        clearInterval(pollInterval);
+                        setIsSyncing(false);
+                        console.error("Sync failed:", statusData.currentJob.error);
+                    }
+                }, 5000); // Poll every 5 seconds
+
+                // Stop polling after 5 minutes max
+                setTimeout(() => {
+                    clearInterval(pollInterval);
+                    setIsSyncing(false);
+                }, 300000);
             }
         } catch (error) {
             console.error("Sync error:", error);
-        } finally {
             setIsSyncing(false);
         }
     }, [refetch, fetchPosts, refetchAnalytics]);

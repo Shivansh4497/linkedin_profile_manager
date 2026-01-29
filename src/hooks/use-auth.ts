@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 
-interface LinkedInProfile {
+export interface LinkedInProfile {
     linkedinId: string;
     name: string;
     headline?: string;
@@ -11,7 +11,7 @@ interface LinkedInProfile {
     connections: number;
 }
 
-interface User {
+export interface User {
     id: string;
     email: string;
     name?: string;

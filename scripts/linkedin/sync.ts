@@ -49,7 +49,7 @@ interface ScrapedDemographic {
 /**
  * LinkedIn Sync - Scrapes profile AND posts, saves to database
  */
-async function syncLinkedInData() {
+export async function syncLinkedInData() {
     console.log("🔄 Starting LinkedIn full sync...");
 
     if (!fs.existsSync(STORAGE_STATE_PATH)) {
